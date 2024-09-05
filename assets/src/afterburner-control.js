@@ -128,6 +128,7 @@ cc.Class({
         wavesMaxAmp: 20,
         wavesMinSpeed: 0.001,
         wavesMaxSpeed: 0.003,
+        plasma: cc.Node,
     },
 
     start () {
@@ -149,6 +150,7 @@ cc.Class({
         this.loopCylinder();
         window.game.node.on('gameover', this.onGameover, this);
         this.gameOver =false;
+        this.plasma.y = -50;
     },
     onGameover () {
         this.gameOver =true;
@@ -195,5 +197,8 @@ cc.Class({
 
         // let normals = calcVertexNormals(positions, this.data.indices, this.data.normals);
         // this.mesh.setVertices(cc.gfx.ATTR_NORMAL, normals);
+        this.plasma.y += dt*400;
+        if(this.plasma.y >=50)
+        this.plasma.y = -50;
     },
 });

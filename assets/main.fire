@@ -1559,7 +1559,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        0,
+        -1,
         0,
         -0.7071067811865475,
         0,
@@ -1886,7 +1886,7 @@
     "_depth": -1,
     "_zoomRatio": 1,
     "_targetTexture": null,
-    "_fov": 60,
+    "_fov": 120,
     "_orthoSize": 800,
     "_nearClip": 1,
     "_farClip": 4096,

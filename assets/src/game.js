@@ -46,14 +46,23 @@ module.exports = cc.Class({
         this.angles = cc.v3();
         this.distance = 0;
         this.lastLevelDistance = 0;
-
+        this.missiles = [];
         this.level = 1;
 
-        this.missile =  cc.instantiate(this.missilePrefab);
-        this.player.addChild(this.missile);
-        this.missile.opacity = 0;
-    },
 
+        window.game.node.on('launch-missile', this.onLaunch, this);
+    },
+    onLaunch({startingPoint})
+    {
+        let missile =  cc.instantiate(this.missilePrefab);
+        missile.is3DNode = true;
+        missile.scaleX= missile.scaleY = missile.scaleZ = 0.25;
+        missile.x = this.player.x;
+        missile.y =  this.player.y;
+        missile.z =  this.player.z;
+        this.missiles.push(missile);
+        this.node.addChild(missile);
+    },
     createMeshNode (name, mesh, shadowCast) {
         let node = new cc.Node(name);
         node.is3DNode = true;
@@ -65,6 +74,8 @@ module.exports = cc.Class({
     },
 
     update (dt) {
+        if(this.energy <=0)
+            return;
         this.angles.z += this.speed * dt;
         this.world.eulerAngles = this.angles;
 
@@ -101,7 +112,6 @@ module.exports = cc.Class({
         let missilePos = cc.v2();
         return function () {
             playerPos = this.player.convertToWorldSpaceAR(zeroPos, playerPos);
-            missilePos = this.missile.convertToWorldSpaceAR(zeroPos, missilePos);
 
             let enemies = this.enemyManager.getComponent('enemy-manager').enemies;
             for (let i = 0; i < enemies.length; i++) {
@@ -113,11 +123,20 @@ module.exports = cc.Class({
                     this.node.emit('collide-enemy', {dif, enemy, distance});
                     break;
                 }
+                for (let j = 0; j < this.missiles.length; j++)
+                 {
+                 missilePos = this.missiles[j].convertToWorldSpaceAR(zeroPos, missilePos);
+
                 let distanceMissile = missilePos.sub(enemyPos, dif).mag();
                 if (distanceMissile < this.collisionDistance) {
                     this.node.emit('collide-enemy-missile', {dif, enemy, distanceMissile});
                     break;
                 }
+                }
+            }
+            if(this.energy <=0)
+            {
+                this.node.emit('gameover');
             }
         }
     })()

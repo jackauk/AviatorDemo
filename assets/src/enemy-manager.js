@@ -30,12 +30,20 @@ cc.Class({
         window.game.node.on('level-upgrade', this.spawnEnemy, this);
         window.game.node.on('collide-enemy', this.onCollider, this);
         window.game.node.on('collide-enemy-missile', this.onCollider, this);
+        window.game.node.on('gameover', this.onGameover, this);
     },
 
     createEnemy () {
         return window.game.createMeshNode('enemy', this._mesh, true);
     },
-
+    onGameover () {
+        for (let i = 0; i < this.enemyCount; i++) {
+            this.enemyPool.pop();
+        }
+        for (let i = 0; i < window.game.level; i++) {
+            this.enemies.pop();
+        }
+    },
     spawnEnemy () {
         let nEnemies = window.game.level;
         let pool = this.enemyPool;

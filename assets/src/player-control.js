@@ -12,7 +12,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        moveSensivity: 5,
+        moveSensivity: 50,
         rotXSensivity: 0.8,
         rotZSensivity: 0.4,
 
@@ -42,6 +42,11 @@ cc.Class({
         canvas.on(cc.Node.EventType.MOUSE_MOVE, this.onMoseMove, this);
         canvas.on(cc.Node.EventType.MOUSE_UP, this.onMoseClicked, this);
         window.game.node.on('collide-enemy', this.onCollider, this);
+        window.game.node.on('gameover', this.onGameover, this);
+        this.gameOver =false;
+    },
+    onGameover () {
+        this.gameOver =true;
     },
     onTouchStart (event) {
         let touches = event.getTouches();
@@ -52,10 +57,11 @@ cc.Class({
         let touches = event.getTouches();
         if( Math.abs(touches[0].getLocation().x - this.touchedMissile.x)<2 && Math.abs(touches[0].getLocation().y - this.touchedMissile.y)<2)
         {
-            let startingPoint = cc.v2();
+            let startingPoint = cc.v3();
             startingPoint.x = this.node.x;
             startingPoint.y = this.node.y;
-            this.node.emit('launch-missile', {startingPoint});
+            startingPoint.z = this.node.z;
+            window.game.node.emit('launch-missile', {startingPoint});
             console.log("onTouchEnd");
          }
     },
@@ -68,9 +74,10 @@ cc.Class({
         this._setTouchPos (event.getLocation() );
     },
     onMoseClicked (event) {
-        let startingPoint = cc.v2();
+        let startingPoint = cc.v3();
         startingPoint.x = this.node.x;
         startingPoint.y = this.node.y;
+        startingPoint.z = this.node.z;
         this.node.emit('launch-missile', {startingPoint});
 
     },
@@ -86,6 +93,9 @@ cc.Class({
     },
 
     update (dt) {
+        if( this.gameOver ==true)
+            return;
+
         let touchPos = this.touchPos;
 
         let targetY = normalize(touchPos.y, -.75,.75, game.playerDefaultY-game.playerYRange, game.playerDefaultY+game.playerYRange);

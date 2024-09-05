@@ -13,6 +13,7 @@ cc.Class({
     },
 
     start () {
+        this.gameOver = false;
         this._initMesh();
 
         let clouds = new Array(this.cloudCount);
@@ -38,8 +39,11 @@ cc.Class({
         }
 
         this.clouds = clouds;
+        window.game.node.on('gameover', this.onGameover, this);
     },
-
+    onGameover () {
+        this.gameOver = true;
+    },
     // for use the same mesh
     _initMesh () {
         let data = cc.primitive.box(1, 1, 1);
@@ -73,6 +77,8 @@ cc.Class({
     },
 
     update (dt) {
+        if( this.gameOver ==true)
+            return;
         for (let i = 0; i < this.clouds.length; i++) {
             let cloud = this.clouds[i];
 
